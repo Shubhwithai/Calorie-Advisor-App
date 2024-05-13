@@ -31,6 +31,7 @@ def input_image_setup(uploaded_file):
 ## Initialize our streamlit app
 st.set_page_config(page_title="calorie Advisor ")
 st.header("Calorie Advisor App")
+st.header("Upload a image of Your Meal/Breakfast/Dinner")
 
 
 uploaded_file = st.file_uploader("Upload a image of Your Meal/Breakfast/Dinner.....", type=["jpg", "jpeg", "png"])
