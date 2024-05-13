@@ -29,10 +29,11 @@ def input_image_setup(uploaded_file):
         raise FileNotFoundError("No file uploaded")
 
 ## Initialize our streamlit app
-st.set_page_config(page_title="Calorie Advisor ")
+st.set_page_config(page_title="calorie Advisor ")
 st.header("Calorie Advisor App")
 
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+
+uploaded_file = st.file_uploader("Upload a image of Your Meal/Breakfast/Dinner.....", type=["jpg", "jpeg", "png"])
 image = ""
 
 if uploaded_file is not None:
