@@ -24,25 +24,25 @@ Calorie Advisor is a Streamlit-based web application that utilizes the power of 
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/your-username/calorie-advisor.git
-   ```bash
+      ```bash
 2. Navigate to the project directory:
    ```bash
    cd calorie-advisor
-   ```bash
+      ```bash
 3. Install the required packages:
     ```bash
    pip install -r requirements.txt
-   ```bash
+      ```bash
 4. Set up your environment variables:
    Create a .env file in the project root.
    Add your Google API Key:
    ```bash
    GOOGLE_API_KEY=your_google_api_key_here
-   ```bash
+      ```bash
 5. Start the Streamlit application:
    ```bash
    streamlit run app.py
-   ```bash
+      ```bash
 
 
 ## Limitations :
