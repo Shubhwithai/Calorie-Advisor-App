@@ -24,7 +24,7 @@ Calorie Advisor is a Streamlit-based web application that utilizes the power of 
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/your-username/calorie-advisor.git
-      ```bash
+   ```
 2. Navigate to the project directory:
    ```bash
    cd calorie-advisor
