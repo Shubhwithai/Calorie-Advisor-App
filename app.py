@@ -1,17 +1,13 @@
-# Import required libraries
-import streamlit as st  # for creating the web app
-from dotenv import load_dotenv  # for loading API key from .env file
+import streamlit as st
+from dotenv import load_dotenv
 import os
-import google.generativeai as genai  # Google's AI model
-from PIL import Image  # for handling images
+import google.generativeai as genai
+from PIL import Image
 
 # Load the API key from .env file
 load_dotenv()
-
-# Set up the Google Gemini AI with your API key
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
-# Function to get AI response about the food image
 def get_gemini_response(image, prompt):
     """Send image to Google's AI and get calorie information"""
     try:
@@ -21,7 +17,6 @@ def get_gemini_response(image, prompt):
     except Exception as e:
         return f"Error: {str(e)}"
 
-# Function to prepare the uploaded image for AI processing
 def prepare_image(uploaded_file):
     """Convert uploaded image to format required by Google's AI"""
     if uploaded_file is not None:
@@ -36,57 +31,56 @@ def prepare_image(uploaded_file):
     else:
         return None
 
-# Main web app
 def main():
-    # Set up the webpage
     st.set_page_config(page_title="Calorie Advisor", page_icon="🍽️")
     
-    # Add title and description
     st.title("🍽️ Calorie Advisor")
-    st.write("Upload a photo of your food to get calorie information!")
+    st.write("Upload a photo of your food to get detailed calorie information!")
 
-    # Create file uploader
     uploaded_file = st.file_uploader(
         "Upload your food image (jpg, jpeg, or png)",
         type=["jpg", "jpeg", "png"]
     )
 
-    # Display uploaded image
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
         st.image(image, caption="Your Food Image", use_column_width=True)
 
-        # Create Analyze button
         if st.button("Calculate Calories"):
             with st.spinner("Analyzing your food..."):
-                # Prepare the prompt for AI
+                # Updated prompt to get more specific responses
                 prompt = """
-                Please analyze this food image and provide:
-                1. List each food item and its calories
-                2. Total calories
-                3. Simple health advice
-
-                Format like this:
-                FOOD ITEMS:
-                1. [Food Item] - [Calories]
-                2. [Food Item] - [Calories]
-
-                TOTAL CALORIES: [Number]
-
-                HEALTH TIPS:
-                • [Tip 1]
-                • [Tip 2]
+                Analyze the food items in this image and provide a detailed breakdown.
+                Give specific calorie estimates for each visible item.
+                
+                Please format your response exactly like this:
+                
+                🍽️ FOOD ITEMS AND CALORIES:
+                1. [Food Item] - [X] calories
+                2. [Food Item] - [X] calories
+                (List all visible items)
+                
+                📊 TOTAL CALORIES: [Sum] calories
+                
+                🔍 NUTRITIONAL BREAKDOWN:
+                • Protein: [X]g
+                • Carbs: [X]g
+                • Fats: [X]g
+                
+                💡 HEALTHY EATING TIPS:
+                • [Specific tip about this meal]
+                • [Suggestion for making this meal healthier]
+                
+                Important: Provide specific numbers and avoid any disclaimers about estimation accuracy.
                 """
 
-                # Get and display AI response
                 image_data = prepare_image(uploaded_file)
                 if image_data is not None:
                     response = get_gemini_response(image_data, prompt)
+                    
+                    # Display the response in a clean format
                     st.success("Analysis Complete!")
-                    st.write(response)
-                else:
-                    st.error("Please upload an image first!")
+                    st.markdown(response)
 
-# Run the app
 if __name__ == "__main__":
     main()
