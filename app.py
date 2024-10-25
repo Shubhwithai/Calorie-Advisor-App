@@ -1,65 +1,92 @@
-from dotenv import load_dotenv
-load_dotenv() ## load all the environment variables
-import streamlit as st
+# Import required libraries
+import streamlit as st  # for creating the web app
+from dotenv import load_dotenv  # for loading API key from .env file
 import os
-import google.generativeai as genai
-from PIL import Image
+import google.generativeai as genai  # Google's AI model
+from PIL import Image  # for handling images
 
+# Load the API key from .env file
+load_dotenv()
+
+# Set up the Google Gemini AI with your API key
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
-## Function to load Google Gemini Pro Vision API And get response
+# Function to get AI response about the food image
 def get_gemini_response(image, prompt):
-    model = genai.GenerativeModel('gemini-1.5-pro')
-    response = model.generate_content([image[0], prompt])
-    return response.text
+    """Send image to Google's AI and get calorie information"""
+    try:
+        model = genai.GenerativeModel('gemini-1.5-pro')
+        response = model.generate_content([image[0], prompt])
+        return response.text
+    except Exception as e:
+        return f"Error: {str(e)}"
 
-def input_image_setup(uploaded_file):
-    # Check if a file has been uploaded
+# Function to prepare the uploaded image for AI processing
+def prepare_image(uploaded_file):
+    """Convert uploaded image to format required by Google's AI"""
     if uploaded_file is not None:
-        # Read the file into bytes
         bytes_data = uploaded_file.getvalue()
         image_parts = [
             {
-                "mime_type": uploaded_file.type,  # Get the mime type of the uploaded file
+                "mime_type": uploaded_file.type,
                 "data": bytes_data
             }
         ]
         return image_parts
     else:
-        raise FileNotFoundError("No file uploaded")
+        return None
 
-## Initialize our streamlit app
-st.set_page_config(page_title="calorie Advisor ")
-st.header("Calorie Advisor App")
-st.write('Upload a image of Your Meal/Breakfast/Dinner')
+# Main web app
+def main():
+    # Set up the webpage
+    st.set_page_config(page_title="Calorie Advisor", page_icon="🍽️")
+    
+    # Add title and description
+    st.title("🍽️ Calorie Advisor")
+    st.write("Upload a photo of your food to get calorie information!")
 
+    # Create file uploader
+    uploaded_file = st.file_uploader(
+        "Upload your food image (jpg, jpeg, or png)",
+        type=["jpg", "jpeg", "png"]
+    )
 
-uploaded_file = st.file_uploader("Upload a image.....", type=["jpg", "jpeg", "png"])
-image = ""
+    # Display uploaded image
+    if uploaded_file is not None:
+        image = Image.open(uploaded_file)
+        st.image(image, caption="Your Food Image", use_column_width=True)
 
-if uploaded_file is not None:
-    image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded Image.", use_column_width=True)
+        # Create Analyze button
+        if st.button("Calculate Calories"):
+            with st.spinner("Analyzing your food..."):
+                # Prepare the prompt for AI
+                prompt = """
+                Please analyze this food image and provide:
+                1. List each food item and its calories
+                2. Total calories
+                3. Simple health advice
 
-submit = st.button("Tell me the total calories")
-input_prompt = """
-You are an expert in nutritionist where you need to see the food items from the image
-               and calculate the total calories, also provide the details of every food items with calories intake
-               is below format
+                Format like this:
+                FOOD ITEMS:
+                1. [Food Item] - [Calories]
+                2. [Food Item] - [Calories]
 
-               1. Item 1 - no of calories
-               2. Item 2 - no of calories
-               ----
-               ----
+                TOTAL CALORIES: [Number]
 
+                HEALTH TIPS:
+                • [Tip 1]
+                • [Tip 2]
+                """
 
+                # Get and display AI response
+                image_data = prepare_image(uploaded_file)
+                if image_data is not None:
+                    response = get_gemini_response(image_data, prompt)
+                    st.success("Analysis Complete!")
+                    st.write(response)
+                else:
+                    st.error("Please upload an image first!")
 
-
-"""
-
-## If submit button is clicked
-if submit:
-    image_data = input_image_setup(uploaded_file)
-    response = get_gemini_response(image_data, input_prompt)
-    st.subheader("The Response is")
-    st.write(response)
+# Run the app
+if __name__ == "__main__":
+    main()
